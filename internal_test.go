@@ -21,4 +21,6 @@ func Test_equalPrefixLength(t *testing.T) {
 	assert.Equal(t, 3, equalPrefixLength([]byte("abcd"), []byte("abc")))
 	assert.Equal(t, 3, equalPrefixLength([]byte("abcd"), []byte("abcv")))
 	assert.Equal(t, 0, equalPrefixLength([]byte("rabcd"), []byte("sabcd")))
+	assert.Equal(t, 1, equalPrefixLength([]byte("M"), []byte("Mon")))
+	assert.Equal(t, 1, equalPrefixLength([]byte("Mon"), []byte("M")))
 }

@@ -1,18 +1,17 @@
-package trie_test
+package trie
 
 import (
 	"testing"
 
-	"github.com/gubsky90/trie"
 	"github.com/gubsky90/trie/testdata"
 )
 
 func BenchmarkInsert(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		tree := &trie.Trie{}
+		root := &Node{}
 		for _, kw := range testdata.Countries {
-			tree.Insert(kw)
+			root.Insert([]byte(kw))
 		}
 	}
 }
@@ -22,13 +21,13 @@ func BenchmarkFindAll(b *testing.B) {
 
 	data := testdata.Countries
 
-	tree := &trie.Trie{}
+	root := &Node{}
 	for _, kw := range data {
-		tree.Insert(kw)
+		root.Insert([]byte(kw))
 	}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		tree.FindAll(data[i%len(data)], func(i interface{}) {})
+		root.FindAll([]byte(data[i%len(data)]), func(i interface{}) {})
 	}
 }

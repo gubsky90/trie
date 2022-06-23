@@ -6,22 +6,24 @@ import (
 	"strings"
 )
 
-func (t *Node) Print(w io.Writer) {
-	t.print("", w)
+func (node *Node) Print(w io.Writer) {
+	if node == nil {
+		fmt.Println("<nil>")
+	} else {
+		node.print("", w)
+	}
 }
 
-func (t *Trie) Print(w io.Writer) {
-	t.root.Print(w)
-}
+func (node *Node) print(prefix string, w io.Writer) {
+	p := node.Prefix[:prefixLength(node.Prefix)]
 
-func (t *Node) print(prefix string, w io.Writer) {
-	p := t.Prefix[:prefixLength(t.Prefix)]
 	fmt.Fprint(w, prefix+string(p))
-	for _, v := range t.Values() {
-		fmt.Print("(", v, ")")
-	}
+	node.Values(func(value Comparable) {
+		fmt.Print("(", value, ")")
+	})
+
 	fmt.Fprintln(w)
-	for _, n := range t.Nodes() {
-		n.print(prefix+strings.Repeat(" ", len(p)), w)
-	}
+	node.Child(func(node *Node) {
+		node.print(prefix+strings.Repeat(" ", len(p)), w)
+	})
 }

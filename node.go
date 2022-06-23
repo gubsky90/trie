@@ -2,23 +2,31 @@ package trie
 
 type (
 	Prefix [7]byte
+	Flags  byte
 
 	Comparable interface {
 		Compare(interface{}) int
 	}
 
-	HandlerFunc func(interface{})
+	HandlerFunc func(value interface{})
 
 	Node struct {
 		Next   []Comparable
-		Flags  byte
+		Flags  Flags
 		Prefix Prefix
 	}
 )
 
 const (
 	PrefixLength = len(Prefix{})
+
+	HasChild  Flags = 1
+	HasValues Flags = 2
 )
+
+func (node *Node) Cursor() Cursor {
+	return &nodeCursor{current: node}
+}
 
 func (node *Node) FindAll(prefix []byte, hf HandlerFunc) {
 	if existNode, _ := node.move(prefix); existNode != nil {
@@ -73,7 +81,6 @@ func (node *Node) Insert(prefix []byte, values ...Comparable) {
 		var newNode Node
 
 		if s := copy(newNode.Prefix[:PrefixLength], prefix); s == PrefixLength && len(prefix) > PrefixLength {
-			//fmt.Println("Insert 1", string(prefix[PrefixLength:]))
 			newNode.Insert(prefix[PrefixLength:], values...)
 		} else {
 			newNode.Next = append(newNode.Next, values...)
@@ -86,47 +93,43 @@ func (node *Node) Insert(prefix []byte, values ...Comparable) {
 			if pl == len(prefix) {
 				existNode.Next = append(existNode.Next, values...)
 			} else {
-				//fmt.Println("Insert 2", string(prefix[pl:]))
 				existNode.Insert(prefix[pl:], values...)
 			}
 		case epl > pl:
 			existNext := existNode.Next
 			existNode.Next = nil
 
-			//fmt.Println("Insert 3", string(existNode.Prefix[pl:]))
 			existNode.Insert(existNode.Prefix[pl:], existNext...)
 
 			for i := pl; i < len(existNode.Prefix); i++ {
 				existNode.Prefix[i] = 0
 			}
 
-			//fmt.Println("Insert 4", string(prefix[pl:]))
 			existNode.Insert(prefix[pl:], values...)
 		default:
-			//fmt.Println("Insert 5", string(prefix[pl:]))
 			existNode.Insert(prefix[pl:], values...)
 		}
 	}
 }
 
-func (node *Node) Values() (res []interface{}) {
-	for _, n := range node.Next {
-		if _, ok := n.(*Node); ok {
-			continue
-		}
-		res = append(res, n)
-	}
-	return
+func (node *Node) Root() bool {
+	return node.Prefix == Prefix{}
 }
 
-func (node *Node) Nodes() (res []*Node) {
+func (node *Node) Values(hf func(value Comparable)) {
 	for _, n := range node.Next {
-		if n, ok := n.(*Node); ok {
-			res = append(res, n)
+		if _, ok := n.(*Node); !ok {
+			hf(n)
 		}
 	}
+}
 
-	return
+func (node *Node) Child(hf func(node *Node)) {
+	for _, n := range node.Next {
+		if n, ok := n.(*Node); ok {
+			hf(n)
+		}
+	}
 }
 
 func (node *Node) findPrefix(prefix []byte) (*Node, int) {

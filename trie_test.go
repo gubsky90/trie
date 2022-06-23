@@ -1,22 +1,21 @@
-package trie_test
+package trie
 
 import (
 	"testing"
 
-	"github.com/gubsky90/trie"
 	"github.com/gubsky90/trie/testdata"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFindAll(t *testing.T) {
-	tree := &trie.Trie{}
+	root := &Node{}
 	for _, kw := range testdata.Countries {
-		tree.Insert(kw, trie.String(kw))
+		root.Insert([]byte(kw), String(kw))
 	}
 
 	var res []string
-	tree.FindAll("Mon", func(value interface{}) {
-		res = append(res, string(value.(trie.String)))
+	root.FindAll([]byte("Mon"), func(value interface{}) {
+		res = append(res, string(value.(String)))
 	})
 
 	assert.ElementsMatch(t, []string{
