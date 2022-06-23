@@ -34,7 +34,7 @@ func (node *Node) Cursor() Cursor {
 
 func (node *Node) FindAll(prefix []byte, hf HandlerFunc) {
 	if existNode, _ := node.move(prefix); existNode != nil {
-		existNode.Handle(hf)
+		existNode.HandleRecursive(hf)
 	}
 }
 
@@ -61,7 +61,7 @@ func (node *Node) Compare(interface{}) int {
 func (node *Node) HandleRecursive(hf HandlerFunc) {
 	for _, n := range node.Next {
 		if c, ok := n.(*Node); ok {
-			c.Handle(hf)
+			c.HandleRecursive(hf)
 		} else {
 			hf(n)
 		}
@@ -153,6 +153,8 @@ func (node *Node) Child(hf func(node *Node)) {
 }
 
 func (node *Node) findPrefix(prefix []byte) (*Node, int) {
+	// TODO: use binary search
+
 	for _, n := range node.Next {
 		if n, ok := n.(*Node); ok {
 			if l := equalPrefixLength(n.Prefix[:], prefix); l > 0 {

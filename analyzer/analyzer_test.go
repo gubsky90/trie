@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/gubsky90/trie"
+	"github.com/gubsky90/trie/testdata"
 )
 
 func TestAnalyzer_Do(t *testing.T) {
@@ -33,6 +34,10 @@ func BenchmarkAnalyzer_Do(b *testing.B) {
 		"she",
 		"he",
 	} {
+		analyzer.Insert(kw, trie.String(kw))
+	}
+
+	for _, kw := range testdata.Countries {
 		analyzer.Insert(kw, trie.String(kw))
 	}
 
