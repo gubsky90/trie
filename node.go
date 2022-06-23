@@ -24,8 +24,12 @@ const (
 	HasValues Flags = 2
 )
 
+func (node *Node) Pointer() Pointer {
+	return Pointer{current: node}
+}
+
 func (node *Node) Cursor() Cursor {
-	return &nodeCursor{current: node}
+	return Cursor{node.Pointer()}
 }
 
 func (node *Node) FindAll(prefix []byte, hf HandlerFunc) {

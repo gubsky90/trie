@@ -1,6 +1,10 @@
 package analyzer
 
-import "github.com/gubsky90/trie"
+import (
+	"os"
+
+	"github.com/gubsky90/trie"
+)
 
 type (
 	Analyzer struct {
@@ -28,7 +32,7 @@ func (a *Analyzer) Insert(kw string, value ...trie.Comparable) {
 }
 
 func (a *Analyzer) Do(q string) {
-	cursors := trie.nodeCursorsArray{a.root.Cursor()}
+	cursors := a.root.Cursor()
 
 	for i := 0; i < len(q); i++ {
 		old := cursors
@@ -40,8 +44,9 @@ func (a *Analyzer) Do(q string) {
 		}
 
 		if q[i] == ' ' {
-			cursors = append(cursors, a.root.Cursor())
+			cursors = append(cursors, a.root.Cursor()...)
 		}
 	}
 
+	cursors.Print(os.Stdout)
 }

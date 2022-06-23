@@ -12,7 +12,5 @@ func TestAnalyzer_Do(t *testing.T) {
 		analyzer.Insert(kw)
 	}
 
-	a := &Analyzer{}
-
-	a.Do("hello from Ukraine!!!")
+	analyzer.Do("hello from Ukraine")
 }

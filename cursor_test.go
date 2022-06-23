@@ -17,8 +17,11 @@ func Test_Node_Cursor(t *testing.T) {
 
 	cur := node.Cursor().Move([]byte("Mo")).Move([]byte("nt")).Move([]byte("e"))
 
-	assert.Equal(t, 1, cur.(*nodeCursor).offset)
-	assert.Equal(t, Prefix{'e', 'n', 'e', 'g', 'r', 'o'}, cur.(*nodeCursor).current.Prefix)
+	if assert.Equal(t, 1, len(cur)) {
+		ptr := cur[0]
+		assert.Equal(t, 1, ptr.offset)
+		assert.Equal(t, Prefix{'e', 'n', 'e', 'g', 'r', 'o'}, ptr.current.Prefix)
+	}
 }
 
 func Test_Node_MultiCursor(t *testing.T) {
@@ -28,15 +31,15 @@ func Test_Node_MultiCursor(t *testing.T) {
 	node.Insert([]byte("Montenegro"))
 	node.Insert([]byte("Montserrat"))
 
-	cur := node.Cursor().Move([]byte("Mo"))
+	ptr, _ := node.Pointer().Move([]byte("Mo"))
 
-	cur1 := cur.Move([]byte("nte"))
-	assert.Equal(t, 1, cur1.(*nodeCursor).offset)
-	assert.Equal(t, Prefix{'e', 'n', 'e', 'g', 'r', 'o'}, cur1.(*nodeCursor).current.Prefix)
+	ptr1, _ := ptr.Move([]byte("nte"))
+	assert.Equal(t, 1, ptr1.offset)
+	assert.Equal(t, Prefix{'e', 'n', 'e', 'g', 'r', 'o'}, ptr1.current.Prefix)
 
-	cur2 := cur.Move([]byte("na"))
-	assert.Equal(t, 1, cur2.(*nodeCursor).offset)
-	assert.Equal(t, Prefix{'a', 'c', 'o'}, cur2.(*nodeCursor).current.Prefix)
+	ptr2, _ := ptr.Move([]byte("na"))
+	assert.Equal(t, 1, ptr2.offset)
+	assert.Equal(t, Prefix{'a', 'c', 'o'}, ptr2.current.Prefix)
 }
 
 func Test_Node_FindNextByte(t *testing.T) {
@@ -56,11 +59,13 @@ func Test_Node_FindNextByte(t *testing.T) {
 	cur.Handle(func(v interface{}) {
 		fmt.Println("First", v)
 	})
+	cur.Print(os.Stdout)
 
 	cur = cur.FindNextByte(' ')
 	cur.Handle(func(v interface{}) {
 		fmt.Println("Second", v)
 	})
+	cur.Print(os.Stdout)
 
 	root.Print(os.Stdout)
 }
