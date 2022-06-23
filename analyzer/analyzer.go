@@ -1,24 +1,13 @@
 package analyzer
 
 import (
-	"os"
-
 	"github.com/gubsky90/trie"
 )
 
 type (
 	Analyzer struct {
-		root     *trie.Node
-		splitter Splitter
+		root *trie.Node
 	}
-
-	Fragment struct {
-		Bytes []byte
-		Start int
-		End   int
-	}
-
-	Splitter func(string) []Fragment
 )
 
 func NewAnalyzer() *Analyzer {
@@ -31,22 +20,25 @@ func (a *Analyzer) Insert(kw string, value ...trie.Comparable) {
 	a.root.Insert([]byte(kw), value...)
 }
 
-func (a *Analyzer) Do(q string) {
-	cursors := a.root.Cursor()
+func (a *Analyzer) Do(q string) (res []interface{}) {
+	cursor := a.root.Cursor()
 
 	for i := 0; i < len(q); i++ {
-		old := cursors
+		old := cursor
+		cursor = old.Move([]byte{q[i]})
 
-		cursors = old.Move([]byte{q[i]})
-
-		if q[i] == 'o' {
-			cursors = append(cursors, old.Move([]byte{'a'})...)
+		for _, p := range cursor {
+			p.Handle(func(value interface{}) {
+				res = append(res, value)
+			})
 		}
 
+		cursor = append(cursor, a.root.Pointer())
+
 		if q[i] == ' ' {
-			cursors = append(cursors, a.root.Cursor()...)
+			cursor = append(cursor, old...)
 		}
 	}
 
-	cursors.Print(os.Stdout)
+	return
 }

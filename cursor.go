@@ -11,14 +11,15 @@ func (c Cursor) Clone() Cursor {
 }
 
 func (c Cursor) Move(prefix []byte) Cursor {
-	var cursor Cursor
+	var i int
 	for _, p := range c {
 		if p, ok := p.Move(prefix); ok {
-			cursor = append(cursor, p)
+			c[i] = p
+			i++
 		}
 	}
 
-	return cursor
+	return c[:i]
 }
 
 func (c Cursor) Handle(hf HandlerFunc) {

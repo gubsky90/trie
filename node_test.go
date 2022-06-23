@@ -57,6 +57,38 @@ func Test_Node_Insert(t *testing.T) {
 	}, node)
 }
 
+func Test_Node_Insert2(t *testing.T) {
+	node := &Node{}
+
+	for _, kw := range []string{
+		"his",
+		"hi",
+		"she",
+		"he",
+	} {
+		node.Insert([]byte(kw), String(kw))
+	}
+
+	assert.Equal(t, &Node{
+		Next: []Comparable{
+			&Node{Prefix: Prefix{'h'}, Next: []Comparable{
+				&Node{Prefix: Prefix{'i'}, Next: []Comparable{
+					&Node{Prefix: Prefix{'s'}, Next: []Comparable{
+						String("his"),
+					}},
+					String("hi"),
+				}},
+				&Node{Prefix: Prefix{'e'}, Next: []Comparable{
+					String("he"),
+				}},
+			}},
+			&Node{Prefix: Prefix{'s', 'h', 'e'}, Next: []Comparable{
+				String("she"),
+			}},
+		},
+	}, node)
+}
+
 func Test_Node_Delete(t *testing.T) {
 	node := &Node{}
 

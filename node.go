@@ -58,11 +58,19 @@ func (node *Node) Compare(interface{}) int {
 	return 0
 }
 
-func (node *Node) Handle(hf HandlerFunc) {
+func (node *Node) HandleRecursive(hf HandlerFunc) {
 	for _, n := range node.Next {
 		if c, ok := n.(*Node); ok {
 			c.Handle(hf)
 		} else {
+			hf(n)
+		}
+	}
+}
+
+func (node *Node) Handle(hf HandlerFunc) {
+	for _, n := range node.Next {
+		if _, ok := n.(*Node); !ok {
 			hf(n)
 		}
 	}
@@ -80,6 +88,10 @@ func (node *Node) Delete(prefix []byte, values ...Comparable) {
 }
 
 func (node *Node) Insert(prefix []byte, values ...Comparable) {
+	if len(prefix) == 0 {
+		return
+	}
+
 	existNode, pl := node.findPrefix(prefix)
 	if existNode == nil {
 		var newNode Node
@@ -109,7 +121,11 @@ func (node *Node) Insert(prefix []byte, values ...Comparable) {
 				existNode.Prefix[i] = 0
 			}
 
-			existNode.Insert(prefix[pl:], values...)
+			if len(prefix[pl:]) > 0 {
+				existNode.Insert(prefix[pl:], values...)
+			} else {
+				existNode.Next = append(existNode.Next, values...)
+			}
 		default:
 			existNode.Insert(prefix[pl:], values...)
 		}

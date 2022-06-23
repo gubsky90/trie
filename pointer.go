@@ -10,7 +10,13 @@ func (p Pointer) Node() *Node {
 }
 
 func (p Pointer) Handle(hf HandlerFunc) {
-	p.current.Handle(hf)
+	if p.Done() {
+		p.current.Handle(hf)
+	}
+}
+
+func (p Pointer) Done() bool {
+	return p.offset == prefixLength(p.current.Prefix)
 }
 
 func (p Pointer) Move(prefix []byte) (Pointer, bool) {
