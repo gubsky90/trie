@@ -1,10 +1,17 @@
 package trie
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"strings"
 )
+
+func (node *Node) String() string {
+	buf := bytes.NewBuffer(nil)
+	node.Print(buf)
+	return buf.String()
+}
 
 func (node *Node) Print(w io.Writer) {
 	if node == nil {
@@ -19,7 +26,7 @@ func (node *Node) print(prefix string, w io.Writer) {
 	fmt.Fprint(w, prefix+">"+string(p))
 
 	node.Values(func(value Comparable) {
-		fmt.Print("(", value, ")")
+		fmt.Fprint(w, "(", value, ")")
 	})
 
 	fmt.Fprintln(w)

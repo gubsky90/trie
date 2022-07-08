@@ -2,6 +2,7 @@ package trie
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -108,6 +109,38 @@ func Test_Node_Delete(t *testing.T) {
 	}, node)
 }
 
+func Test_Node_Delete2(t *testing.T) {
+	root := &Node{}
+
+	for _, kw := range []string{
+		"his",
+		"hi",
+		"she",
+		"he",
+	} {
+		root.Insert([]byte(kw), String(kw))
+	}
+
+	assert.Equal(t,
+		` >
+ >h
+  >i(hi)
+   >s(his)
+  >e(he)
+ >she(she)
+`, root.String())
+
+	root.Delete([]byte("hi"))
+
+	assert.Equal(t,
+		` >
+ >h
+  >is(his)
+  >e(he)
+ >she(she)
+`, root.String())
+}
+
 func Test_Node_InsertExample(t *testing.T) {
 	root := &Node{}
 
@@ -119,6 +152,9 @@ func Test_Node_InsertExample(t *testing.T) {
 	} {
 		root.Insert([]byte(kw), String(kw))
 	}
+
+	root.Delete([]byte("hi"))
+	root.Print(os.Stdout)
 
 	cur := root.Cursor().Move([]byte("h"))
 	cur.Handle(true, func(value interface{}) {
