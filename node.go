@@ -68,9 +68,14 @@ func (node *Node) HandleRecursive(hf HandlerFunc) {
 	}
 }
 
-func (node *Node) Handle(hf HandlerFunc) {
+func (node *Node) Handle(deep bool, hf HandlerFunc) {
 	for _, n := range node.Next {
-		if _, ok := n.(*Node); !ok {
+		switch n := n.(type) {
+		case *Node:
+			if deep {
+				n.Handle(deep, hf)
+			}
+		default:
 			hf(n)
 		}
 	}

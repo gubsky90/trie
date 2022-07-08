@@ -56,13 +56,13 @@ func Test_Node_FindNextByte(t *testing.T) {
 	cur := root.Cursor()
 
 	cur = cur.FindNextByte(' ')
-	cur.Handle(func(v interface{}) {
+	cur.Handle(false, func(v interface{}) {
 		fmt.Println("First", v)
 	})
 	cur.Print(os.Stdout)
 
 	cur = cur.FindNextByte(' ')
-	cur.Handle(func(v interface{}) {
+	cur.Handle(false, func(v interface{}) {
 		fmt.Println("Second", v)
 	})
 	cur.Print(os.Stdout)

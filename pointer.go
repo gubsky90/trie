@@ -9,9 +9,9 @@ func (p Pointer) Node() *Node {
 	return p.current
 }
 
-func (p Pointer) Handle(hf HandlerFunc) {
-	if p.Done() {
-		p.current.Handle(hf)
+func (p Pointer) Handle(deep bool, hf HandlerFunc) {
+	if deep || p.Done() {
+		p.current.Handle(deep, hf)
 	}
 }
 

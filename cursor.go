@@ -22,9 +22,9 @@ func (c Cursor) Move(prefix []byte) Cursor {
 	return c[:i]
 }
 
-func (c Cursor) Handle(hf HandlerFunc) {
+func (c Cursor) Handle(deep bool, hf HandlerFunc) {
 	for _, p := range c {
-		p.Handle(hf)
+		p.Handle(deep, hf)
 	}
 }
 

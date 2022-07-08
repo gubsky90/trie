@@ -1,6 +1,7 @@
 package trie
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -105,4 +106,22 @@ func Test_Node_Delete(t *testing.T) {
 			}},
 		},
 	}, node)
+}
+
+func Test_Node_InsertExample(t *testing.T) {
+	root := &Node{}
+
+	for _, kw := range []string{
+		"his",
+		"hi",
+		"she",
+		"he",
+	} {
+		root.Insert([]byte(kw), String(kw))
+	}
+
+	cur := root.Cursor().Move([]byte("h"))
+	cur.Handle(true, func(value interface{}) {
+		fmt.Println(value)
+	})
 }
